@@ -27,11 +27,11 @@ def login():
         user = models.LoginUser.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
             flash(Markup(
-                'Invalid username or password <li class="meir" id="result"> incorrect Username/password or Two-factor failure </li>'))
+                'Invalid username or password <li class="zack" id="result"> incorrect Username/password or Two-factor failure </li>'))
             print("INVALID")
             return redirect(url_for('login'))
         login_user(user)
-        flash(Markup('Logged in successfully. <li class="meir" id="result"> success </li>'))
+        flash(Markup('Logged in successfully. <li class="zack" id="result"> success </li>'))
         return redirect(url_for('spell_checker'))
     return render_template('login.html', title='Sign In', form=form)
 
@@ -46,11 +46,11 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash(Markup('Congratulations, you are now a registered user! <li class="meir" id="success"> success </li>'))
+        flash(Markup('Congratulations, you are now a registered user! <li class="zack" id="success"> success </li>'))
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     else:
-        flash(Markup('Something went wrong. Please try to register again <li class="meir" id="success"> failure </li>'))
+        flash(Markup('Something went wrong. Please try to register again <li class="zack" id="success"> failure </li>'))
         return render_template('register.html', title='Sign Up', form=form)
 
 
@@ -79,7 +79,7 @@ def spell_checker():
         if output is None:
             output = " No misspelled words"
 
-        flash(Markup('<li id=textout>Misspelled words are:  </li><li class="meir" id="misspelled"> ' + output + ' </li>'))
+        flash(Markup('<li id=textout>Misspelled words are:  </li><li class="zack" id="misspelled"> ' + output + ' </li>'))
 
     return render_template('spell_check.html', title="Spell Check App", form=form)
 
