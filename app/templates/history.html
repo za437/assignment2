@@ -36,7 +36,7 @@
         {{ form.hidden_tag() }}
             <p>
             {{ form.username.label  }}<br>
-            {{ form.username(id = "query.userid") }}
+            {{ form.username(id = "userquery") }}
             {% for error in form.username.errors %}
             <span id = "incorrect" style="color: red;">[{{ error }}]</span>
             {% endfor %}
