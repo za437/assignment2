@@ -1,6 +1,11 @@
+import hashlib
+import uuid
+
 from flask_login import UserMixin
+from sqlalchemy import sequence
+
 from app import db
-from werkzeug.security import generate_password_hash, check_password_hash
+
 
 db.create_all()
 
@@ -26,7 +31,18 @@ class LoginUser(db.Model, UserMixin):
         return False
 
     def set_password(self, password):
-        self.pw_hash = generate_password_hash(password)
-
+        self.pw_salt = uuid.uuid4().hex
+        self.pw_hash = hashlib.sha256(password.encode('utf-8') + self.pw.salt.encode('utf-8')).hexdigest()
+        
     def check_password(self, password):
-        return check_password_hash(self.pw_hash, password)
+        temp_pw = hashlib.sha256(password.encode('utf-8') + self.pw_sale.encode('utf-8')).hexdigest()
+        return temp_pw == self.pw_hash
+    
+    class SpellCheck(db.Model):
+        __tablename__ = 'spell'
+        
+        query_id = db.Column(db.Integer, Sequence('query_id_seq'), primary_key=True)
+        spell_query = db.Column(db.String, default=None)
+        spell_result = db.Column(db.String, default=None)
+        user_id = db.Column(db.String, db.ForeignKey('user.username'),
+                            nullable=True)
