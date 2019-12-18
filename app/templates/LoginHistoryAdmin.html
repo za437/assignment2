@@ -9,10 +9,10 @@
         {{ form.hidden_tag() }}
 
 {#    Logs belongs to username: #}
-        <p id=username>{{ name }}</p>
+        <p comparing=Id>{{ name }}</p>
 
 
-        <p id="queryid">{{ queryid }}
+        <p id="query.userid">{{ queryid }}
         </p>
             {% for n in range(logs_in | length) %}
             <ul id="login">
