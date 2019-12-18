@@ -1,1 +1,70 @@
-{
+{% extends "layout.html" %}
+{% block content %}
+
+    <h1>{{title}}</h1>
+    <form action="" method="post" novalidate >
+
+
+    {% if current_user.is_admin() %}
+
+        <h1>All Queries Available</h1>
+
+        {% if queries_dict and not data %}
+        <p id="numqueries">{{ queries_dict | length }}</p>
+            <ul>
+        {% for n in range(queries_dict | length) %}
+        <li id="query{{ n + 1 }}"> {{ queries_dict[n+1] }} <a href="history/query{{ n + 1  }}">click</a></li>
+        {% endfor %}
+            </ul>
+        {% endif %}
+
+        <h1>Showing queries for the user: {{ form.username.data }}</h1>
+
+
+          {% if data %}
+        <p id="numqueries">{{ data | length }}</p>
+            <ul>
+        {% for n in range(data | length) %}
+        <li id="query{{ n + 1 }}">{{ data[index[n]] }} <a href="history/query{{ index[n]  }}">click</a></li>
+        {% endfor %}
+            </ul>
+
+
+    {%  endif %}
+
+
+        {{ form.hidden_tag() }}
+            <p>
+            {{ form.username.label  }}<br>
+            {{ form.username(id = "userquery") }}
+            {% for error in form.username.errors %}
+            <span id = "incorrect" style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+            <p>{{ form.submit() }}</p>
+
+     </form>
+
+        {% else %}
+        <h1>Showing queries for the user: {{ current_user.get_id() }}</h1>
+            {% if data %}
+        <p id="numqueries"> Number of queries: {{ data | length }}
+        </p>
+            <ul>
+
+        {% for n in range(data | length) %}
+        <li id="query{{ n + 1 }}">{{ data[index[n]] }} <a href="history/query{{ index[n]  }}">click</a></li>
+        {% endfor %}
+            </ul>
+
+    {% else %}
+        <p id="numqueries">0</p>
+              <p id="query0">0</p>
+              <p>No History to Show</p>
+
+    {%  endif %}
+
+
+    {% endif %}
+
+{% endblock %}
