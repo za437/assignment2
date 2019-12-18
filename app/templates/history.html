@@ -36,7 +36,7 @@
         {{ form.hidden_tag() }}
             <p>
             {{ form.username.label  }}<br>
-            {{ form.username(id = "userquery") }}
+            {{ form.username(id = "query.userid") }}
             {% for error in form.username.errors %}
             <span id = "incorrect" style="color: red;">[{{ error }}]</span>
             {% endfor %}
@@ -46,7 +46,7 @@
      </form>
 
         {% else %}
-        <h1>Showing queries for the user: {{ current_user.get_id() }}</h1>
+        <h1>Showing queries for the user: {{ query.userid.get_id() }}</h1>
             {% if data %}
         <p id="numqueries"> Number of queries: {{ data | length }}
         </p>
