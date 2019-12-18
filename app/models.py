@@ -53,8 +53,7 @@ class LoginUser(db.Model, UserMixin):
     def set_logs_in(self, logs_in):
         old_logs_in = self.get_logs_in()
         if old_logs_in is None:
-            # first result for this user
-            self.logs_in = logs_in
+           self.logs_in = logs_in
         else:  # not the first query
             new_logs_in = str(old_logs_in) + "{cut}" + logs_in
             self.logs_in = new_logs_in
