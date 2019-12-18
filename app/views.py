@@ -27,11 +27,15 @@ def login():
         user = models.LoginUser.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
             flash(Markup(
-                'Invalid username or password <li class="zack" id="result"> incorrect Username/password or Two-factor failure </li>'))
+                'Invalid username or password <li class="zak" id="result"> incorrect Username/password or Two-factor failure </li>'))
             print("INVALID")
             return redirect(url_for('login'))
         login_user(user)
-        flash(Markup('Logged in successfully. <li class="zack" id="result"> success </li>'))
+        flash(Markup('Logged in successfully. <li class="zak" id="result"> success </li>'))
+        now = datetime.now()
+        current_time = now.strftime("%H:%M")
+        current_user.set_logs_in(current_time)
+        db.session.commit()
         return redirect(url_for('spell_checker'))
     return render_template('login.html', title='Sign In', form=form)
 
@@ -78,6 +82,14 @@ def spell_checker():
 
         if output is None:
             output = " No misspelled words"
+            
+            
+            
+        user_query = models.SpellCheck(spell_query=form.command.data, spell_result=output,
+                                       user_id=current_user.get_id())
+        db.session.add(user_query)
+        db.session.commit()
+        
 
         flash(Markup('<li id=textout>Misspelled words are:  </li><li class="zack" id="misspelled"> ' + output + ' </li>'))
 
