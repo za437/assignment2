@@ -110,35 +110,6 @@ def logout():
     logout_user()
     return redirect('index')
              
-@app.route('/history', methods=['GET', 'POST'])
-def history():
-    if not current_user.is_authenticated:
-        return redirect(url_for('login'))
-    elif current_user.is_admin():
-        # Print all users queries
-        queries = SpellCheck.query.all()
-        queries_dict = dict()
-        data = dict()
-        for idt in queries:
-            queries_dict[idt.query_id] = [idt.spell_result, idt.spell_query, idt.user_id]
-        form = HistoryAdmin()
-        if form.validate_on_submit():
-            user = models.SpellCheck.query.filter_by(user_id=form.username.data).all()
-            index = list()
-            try:
-                for idt in user:
-                    data[idt.query_id] = [idt.spell_result, idt.spell_query, idt.user_id]
-                    index.append(idt.query_id)
-            except:
-                form.username.data = "'" + form.username.data + "'" + " Not a Valid User"
-                return render_template('history.html', title="User History", data=False, form=form)
-            print(index)
-            return render_template('history.html', title="User History", data=data, form=form, queries_dict=queries_dict
-                                   , index=index)
-        else:
-            return render_template('history.html', title="User History", data=False, queries_dict=queries_dict,
-                                   form=form)
-
     else:
         user = models.SpellCheck.query.filter_by(user_id=current_user.get_id()).all()
         data = dict()
