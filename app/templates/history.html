@@ -5,7 +5,7 @@
     <form action="" method="post" novalidate >
 
 
-    {% if current_user.is_admin() %}
+    {% if comparingID.is_admin() %}
 
         <h1>All Queries Available</h1>
 
@@ -36,7 +36,7 @@
         {{ form.hidden_tag() }}
             <p>
             {{ form.username.label  }}<br>
-            {{ form.username(id = "userquery") }}
+            {{ form.username(id = "query.userid") }}
             {% for error in form.username.errors %}
             <span id = "incorrect" style="color: red;">[{{ error }}]</span>
             {% endfor %}
