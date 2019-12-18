@@ -4,9 +4,11 @@ import subprocess
 from datetime import datetime
 
 from app import app, db, models
-from app.forms import LoginForm, RegisterForm, SpellChecker
+from app.forms import LoginForm, RegisterForm, SpellChecker, HistoryAdmin, LoginHistoryAdmin
 
 import os
+
+from app.models import SpellCheck
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 login_manager = LoginManager(app)
@@ -28,13 +30,13 @@ def login():
         user = models.LoginUser.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
             flash(Markup(
-                'Invalid username or password <li class="zak" id="result"> incorrect Username/password or Two-factor failure </li>'))
+                'Invalid username or password <li class="meir" id="result"> incorrect Username/password or Two-factor failure </li>'))
             print("INVALID")
             return redirect(url_for('login'))
         login_user(user)
-        flash(Markup('Logged in successfully. <li class="zak" id="result"> success </li>'))
+        flash(Markup('Logged in successfully. <li class="meir" id="result"> success </li>'))
         now = datetime.now()
-        current_time = now.strftime("%H:%M":%S")
+        current_time = now.strftime("%H:%M:%S")
         current_user.set_logs_in(current_time)
         current_user.set_logs_out('N/A.')
         db.session.commit()
@@ -52,11 +54,11 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash(Markup('Congratulations, you are now a registered user! <li class="zack" id="success"> success </li>'))
+        flash(Markup('Congratulations, you are now a registered user! <li class="meir" id="success"> success </li>'))
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     else:
-        flash(Markup('Something went wrong. Please try to register again <li class="zack" id="success"> failure </li>'))
+        flash(Markup('Something went wrong. Please try to register again <li class="meir" id="success"> failure </li>'))
         return render_template('register.html', title='Sign Up', form=form)
 
 
@@ -83,17 +85,17 @@ def spell_checker():
                     output = output + ", " + word
 
         if output is None:
-            output = " No misspelled words"
-            
-            
-            
+            output = "No misspelled words"
+
+
+
         user_query = models.SpellCheck(spell_query=form.command.data, spell_result=output,
                                        user_id=current_user.get_id())
         db.session.add(user_query)
         db.session.commit()
-        
 
-        flash(Markup('<li id=textout>Misspelled words are:  </li><li class="zack" id="misspelled"> ' + output + ' </li>'))
+        flash(
+            Markup('<li id=textout>Misspelled words are:  </li><li class="meir" id="misspelled"> ' + output + ' </li>'))
 
     return render_template('spell_check.html', title="Spell Check App", form=form)
 
@@ -104,12 +106,35 @@ def index():
     return render_template('index.html')
 
 
-@app.route("/logout")
-@login_required
-def logout():
-    logout_user()
-    return redirect('index')
-             
+@app.route('/history', methods=['GET', 'POST'])
+def history():
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))
+    elif current_user.is_admin():
+        # Print all users queries
+        queries = SpellCheck.query.all()
+        queries_dict = dict()
+        data = dict()
+        for idt in queries:
+            queries_dict[idt.query_id] = [idt.spell_result, idt.spell_query, idt.user_id]
+        form = HistoryAdmin()
+        if form.validate_on_submit():
+            user = models.SpellCheck.query.filter_by(user_id=form.username.data).all()
+            index = list()
+            try:
+                for idt in user:
+                    data[idt.query_id] = [idt.spell_result, idt.spell_query, idt.user_id]
+                    index.append(idt.query_id)
+            except:
+                form.username.data = "'" + form.username.data + "'" + " Not a Valid User"
+                return render_template('history.html', title="User History", data=False, form=form)
+            print(index)
+            return render_template('history.html', title="User History", data=data, form=form, queries_dict=queries_dict
+                                   , index=index)
+        else:
+            return render_template('history.html', title="User History", data=False, queries_dict=queries_dict,
+                                   form=form)
+
     else:
         user = models.SpellCheck.query.filter_by(user_id=current_user.get_id()).all()
         data = dict()
@@ -194,4 +219,3 @@ def loginHistory():
             return render_template('LoginHistoryAdmin.html', title="Login History", form=form, flag=False)
     else:
         return redirect('index')
-
